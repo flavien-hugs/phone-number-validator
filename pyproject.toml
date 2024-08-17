@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "phone-number-validator"
+name = "phone_number_validator"
 version = "0.1.0"
 description = ""
 authors = ["flavien-hugs <flavienhugs@pm.me>"]
 readme = "README.md"
-packages = [{include = "phone-number-validator"}]
+packages = [{include = "phone_number_validator"}]
 
 [tool.poetry.dependencies]
 python = "^3.12"
@@ -17,7 +17,9 @@ ipython = "^8.26.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.3.2"
-requests-mock = "^1.12.1"
+pytest-httpx = "^0.30.0"
+pytest-asyncio = "^0.23.8"
+faker = "^27.0.0"
 
 [build-system]
 requires = ["poetry-core"]
