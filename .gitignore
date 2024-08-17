@@ -53,3 +53,5 @@ tips.txt
 *.http
 api.http
 *.lock
+tests/.DS_Store
+dist
