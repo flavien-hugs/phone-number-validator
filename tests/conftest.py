@@ -1,7 +1,6 @@
 import pytest
-from phone_number_validator.validator import PhoneNumberValidator
 
-from faker import Faker
+from phone_number_validator.validator import PhoneNumberValidator
 
 
 @pytest.fixture
