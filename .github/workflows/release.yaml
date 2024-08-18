@@ -1,42 +1,64 @@
 name: Release
+
 on:
-  release:
-    types:
-      - published
+  push:
+    branches:
+      - main
 
 jobs:
-  publish:
+  release:
     strategy:
       fail-fast: false
       matrix:
         python-version: ['3.x']
-        poetry-version: [1.8.3]
         os: [ubuntu-latest]
-    
-    name: upload release to PyPI
+
+    name: Create release
     runs-on: ${{ matrix.os }}
     
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
       
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       
-      - name: Install Poetry
+      - name: Install pipx, Poetry and Upgrade pip/setuptools
         run: |
-          python -m pip install --upgrade pip
-          pip install poetry@${{ matrix.poetry-version }}
-      
-      - name: Install dependencies
-        run: |
+          python --version
+          python -m pip install pipx
+          python -m pipx ensurepath
+          python -m pipx install poetry
+          export PATH=$PATH:/root/.local/bin
+          poetry env use python
+          poetry run pip install --upgrade pip setuptools
           poetry install --no-root
-          
+
       - name: Build package
         run: |
           poetry build
-          
+      
+      - name: Get version from pyproject.toml
+        id: get_version
+        run: |
+          echo "::set-output name=version::$(poetry version -s)"
+      
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: v${{ steps.get_version.outputs.version }}
+          release_name: Release v${{ steps.get_version.outputs.version }}
+          body: |
+            Changelog:
+            - Description des modifications pour cette version.
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACTION_PYPI_TOKEN }}
+      
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
